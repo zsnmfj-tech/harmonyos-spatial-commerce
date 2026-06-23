@@ -1,0 +1,81 @@
+<h2>P1 · 空间核心闭环 · 架构与数据流</h2>
+<p class="subtitle">5 个模块、一条主链路。颜色区分技术层：<span style="color:#9d8fff">■ NDK (C/C++)</span> &nbsp; <span style="color:#5fd9a3">■ ArkTS</span></p>
+
+<div class="section">
+  <h3>端到端数据流（商家扫描 → 买家沉浸）</h3>
+  <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;font-size:12px">
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(107,91,255,.18);border:1px solid rgba(107,91,255,.4)">
+      <div class="label" style="color:#9d8fff">NDK</div><b>Camera 取帧</b><br><span style="opacity:.7">1080×1440 RGB</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(107,91,255,.18);border:1px solid rgba(107,91,255,.4)">
+      <div class="label" style="color:#9d8fff">NDK</div><b>AR Engine</b><br><span style="opacity:.7">位姿/内参</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(107,91,255,.22);border:2px solid #6b5bff">
+      <div class="label" style="color:#9d8fff">NDK</div><b>Spatial Recon</b><br><span style="opacity:.7">3DGS 重建</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(150,160,180,.15);border:1px solid rgba(150,160,180,.4)">
+      <div class="label" style="color:#aab2c5">落盘</div><b>PLY / MP4</b><br><span style="opacity:.7">app sandbox</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(62,207,142,.15);border:1px solid rgba(62,207,142,.4)">
+      <div class="label" style="color:#5fd9a3">ArkTS</div><b>ModelStore</b><br><span style="opacity:.7">索引/缩略图</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(107,91,255,.18);border:1px solid rgba(107,91,255,.4)">
+      <div class="label" style="color:#9d8fff">NDK</div><b>3DGS 加载渲染</b><br><span style="opacity:.7">Spatial Recon loader</span>
+    </div>
+    <div style="display:flex;align-items:center;color:#666">▶</div>
+
+    <div style="flex:1;min-width:110px;padding:10px;border-radius:8px;background:rgba(62,207,142,.22);border:2px solid #3ecf8e">
+      <div class="label" style="color:#5fd9a3">ArkTS</div><b>沉浸光感展示</b><br><span style="opacity:.7">光随指动/材质</span>
+    </div>
+
+  </div>
+  <p style="font-size:12px;opacity:.6;margin-top:8px">⚠️ ArkTS 与 NDK 之间通过 <b>napi</b> 桥接。重建全程同一时刻只允许一个 session。</p>
+</div>
+
+<div class="section">
+  <h3>5 个模块 · 职责与接口</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+    <div style="padding:12px;border-radius:8px;background:rgba(107,91,255,.10);border:1px solid rgba(107,91,255,.3)">
+      <div class="label" style="color:#9d8fff">① CaptureKit · NDK</div>
+      <b>扫描捕获</b>
+      <p style="margin:4px 0 0;font-size:12px;line-height:1.5">管 Camera + AR Engine 会话；推 1080×1440 RGB 帧；订阅温升事件自动暂停。<br><span class="label">接口: start()/stop()/pushFrame()</span></p>
+    </div>
+
+    <div style="padding:12px;border-radius:8px;background:rgba(107,91,255,.10);border:1px solid rgba(107,91,255,.3)">
+      <div class="label" style="color:#9d8fff">② ReconEngine · NDK</div>
+      <b>重建引擎</b>
+      <p style="margin:4px 0 0;font-size:12px;line-height:1.5">封装 Spatial Recon 生命周期；进度回调；输出 PLY（展示用）+ MP4（预览）。单 session 守卫。<br><span class="label">接口: start()/pause()/resume()/progress()/save()</span></p>
+    </div>
+
+    <div style="padding:12px;border-radius:8px;background:rgba(62,207,142,.10);border:1px solid rgba(62,207,142,.3)">
+      <div class="label" style="color:#5fd9a3">③ ModelStore · ArkTS</div>
+      <b>模型管理</b>
+      <p style="margin:4px 0 0;font-size:12px;line-height:1.5">本地落盘 + RelationalStore 索引（名称/品类/时间/缩略图）；上传接口 <b>stub</b>，P2 接真实对象存储+CDN。<br><span class="label">接口: save()/list()/load()/delete()</span></p>
+    </div>
+
+    <div style="padding:12px;border-radius:8px;background:rgba(62,207,142,.10);border:1px solid rgba(62,207,142,.3)">
+      <div class="label" style="color:#5fd9a3">④ Showcase · ArkTS+NDK</div>
+      <b>沉浸展示</b>
+      <p style="margin:4px 0 0;font-size:12px;line-height:1.5">3DGS 渲染 + 单指旋转/双指缩放；沉浸光感施加于 chrome（TitleBar/卡片/控件）；材质预设（金属/宝石/玻璃）。<br><span class="label">接口: loadModel()/setMaterial()/resetView()</span></p>
+    </div>
+
+    <div style="padding:12px;border-radius:8px;background:rgba(255,209,102,.10);border:1px solid rgba(255,209,102,.35);grid-column:1/-1">
+      <div class="label" style="color:#ffd166">⑤ Shell · ArkTS</div>
+      <b>模式切换 / 导航 / 全局光感</b>
+      <p style="margin:4px 0 0;font-size:12px;line-height:1.5">单 App 双角色（买家⇄商家）；列表页 / 详情页 / 扫描页 / 我的；全局 TitleBar/TabBar 施加沉浸光感。<span class="label"> 不含交易（P3）。</span></p>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,27 @@
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- IDE / DevEco Studio ----
+.idea/
+*.iml
+.vscode/
+
+# ---- HarmonyOS / DevEco build artifacts ----
+**/build/
+.cxx/
+.hvigor/
+.cxx-cache/
+local.properties
+*.hap
+*.hsp
+*.app
+oh_modules/
+**/oh_modules/
+
+# ---- Node (DevEco uses hvigor) ----
+node_modules/
+
+# ---- misc ----
+*.log

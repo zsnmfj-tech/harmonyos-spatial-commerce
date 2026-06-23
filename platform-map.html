@@ -1,0 +1,85 @@
+<h2>平台全景 & 建设顺序</h2>
+<p class="subtitle">单 App 双角色 · 完整电商闭环太大，一次设计不完。先看全景，再切第一刀。</p>
+
+<div class="section">
+  <h3>全景：四层模块</h3>
+  <div style="display:grid;grid-template-columns:1fr;gap:10px">
+
+    <div style="padding:14px;border-radius:10px;background:rgba(107,91,255,.10);border:1px solid rgba(107,91,255,.30)">
+      <div class="label" style="color:#9d8fff;margin-bottom:8px">捕获层 · 商家模式</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(107,91,255,.25);font-size:13px">📷 AR Engine 取帧</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(107,91,255,.25);font-size:13px">🧊 Spatial Recon 3DGS 重建</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(107,91,255,.25);font-size:13px">🔥 温升治理</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(107,91,255,.25);font-size:13px">💾 PLY/MP4 落盘</span>
+      </div>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(62,207,142,.10);border:1px solid rgba(62,207,142,.30)">
+      <div class="label" style="color:#5fd9a3;margin-bottom:8px">展示层 · 买家模式（核心差异化）</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(62,207,142,.22);font-size:13px">💡 沉浸光感材质</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(62,207,142,.22);font-size:13px">🖱 3D 旋转/缩放/光随指动</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(62,207,142,.22);font-size:13px">🎨 材质预设（金属/宝石/玻璃）</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(62,207,142,.22);font-size:13px">📦 3DGS 加载渲染</span>
+      </div>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(195,76,232,.10);border:1px solid rgba(195,76,232,.30)">
+      <div class="label" style="color:#d68bff;margin-bottom:8px">交易层 · 电商闭环</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(195,76,232,.22);font-size:13px">🛒 购物车</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(195,76,232,.22);font-size:13px">💳 华为支付</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(195,76,232,.22);font-size:13px">🛡 数字盾（TEE 级）</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(195,76,232,.22);font-size:13px">📋 订单管理</span>
+      </div>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(150,160,180,.10);border:1px solid rgba(150,160,180,.30)">
+      <div class="label" style="color:#aab2c5;margin-bottom:8px">基础层</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(150,160,180,.22);font-size:13px">👤 账号（买家/商家）</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(150,160,180,.22);font-size:13px">🗂 商品目录/搜索</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(150,160,180,.22);font-size:13px">☁️ 模型对象存储 + CDN</span>
+        <span style="padding:6px 12px;border-radius:6px;background:rgba(150,160,180,.22);font-size:13px">📊 商家后台</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>建设顺序（每个 P 一份独立 spec → plan → 实现）</h3>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px">
+
+    <div style="padding:14px;border-radius:10px;background:rgba(255,209,102,.18);border:2px solid #ffd166">
+      <div class="label" style="color:#ffd166">P1 · 本次详细设计</div>
+      <h3 style="margin:6px 0;color:#ffe599">空间核心闭环</h3>
+      <p style="margin:0;font-size:13px;line-height:1.5">扫描重建 → 存储 → 沉浸展示 → 光感互动。<strong>不碰交易</strong>，先验证空间化卖点。</p>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(150,160,180,.08);border:1px solid rgba(150,160,180,.25)">
+      <div class="label" style="color:#aab2c5">P2</div>
+      <h3 style="margin:6px 0">商品化与目录</h3>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#c0c6d4">商家上架、商品化包装、分类搜索。模型变成"商品"。</p>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(150,160,180,.08);border:1px solid rgba(150,160,180,.25)">
+      <div class="label" style="color:#aab2c5">P3</div>
+      <h3 style="margin:6px 0">交易闭环</h3>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#c0c6d4">购物车、华为支付、数字盾、订单售后。</p>
+    </div>
+
+    <div style="padding:14px;border-radius:10px;background:rgba(150,160,180,.08);border:1px solid rgba(150,160,180,.25)">
+      <div class="label" style="color:#aab2c5">P4 · v2</div>
+      <h3 style="margin:6px 0">分发增长</h3>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#c0c6d4">元服务、服务卡片、闪控窗（C 方案进化）。</p>
+    </div>
+
+  </div>
+</div>
+
+<div style="margin-top:24px;padding:16px;border-radius:12px;background:rgba(255,209,102,.10);border:1px solid rgba(255,209,102,.35)">
+  <p class="label" style="margin:0 0 6px;color:#ffd166">为什么 P1 先做</p>
+  <p style="margin:0">空间化能力是<strong>唯一不可替代的差异化</strong>。支付/目录/订单用任何框架都能做，但"端侧 3DGS 重建 + 沉浸光感材质"的组合只有 HarmonyOS 7 有。P1 验证不了，后面三层都没意义。</p>
+</div>
