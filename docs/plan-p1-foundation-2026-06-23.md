@@ -15,7 +15,7 @@
 1. **本计划所有命令面向 DevEco Studio + HarmonyOS SDK**。当前 bash shell 没有 SDK，**不能在此执行或验证任何步骤**。实现者在 DevEco Studio 里执行。
 2. **逻辑/数据/UI 任务** → 在 **DevEco 本地手机模拟器** 上跑 hypium 测试即可验证，不需要真机。
 3. **真 AR Engine / Spatial Recon / 3DGS 渲染** → 不在本计划，归入后续「真机集成」计划，需 **AGC 云调试真机（API 26 / 7.0.0.23）**。
-4. **沉浸光感属性名未完全确认**：官方 `arkts-immersive-light-sense` 文档抓取失败。Task 12 施加光感时，先按 HDS 材质文档（`ui-design-hds-component-material`）核验确切属性名；候选：`.material()` / `.backgroundBlurStyle()` / HDS TitleBar 的 `TitleBarStyle`。实现时以 SDK 实际导出为准。
+4. **沉浸光感 API 已确认**（2026-06-23，见 `docs/notes-immersive-light-sense.md`）：`@kit.UIDesignKit` 的 `systemMaterialEffect`（`materialType` + `materialLevel`），仅施加于 `HdsNavigation` 标题栏与 `HdsTabs` 底部页签；`IMMERSIVE` 材质自带光随指动/光线勾勒/非线性形变。地基 Task 12 模拟器阶段用 `backgroundBlurStyle` 占位，真实光感在真机计划 D7 用 HDS 组件实现。
 5. **API 名真实性**：NDK 函数名（`HMS_SpatialRecon_*`、`HMS_AREngine_*`）来自官方文档原文，可直接引用；但本计划仅写 ArkTS interface，不写 NDK 实现。
 
 ---
@@ -979,7 +979,7 @@ git commit -m "feat(components): add MaterialPicker for 4 material presets"
 
 ## Task 12: ShowcaseChrome（沉浸光感覆盖层）
 
-> ⚠️ 见「置信度与验证约定」第 4 条：确切沉浸光感属性名以 HDS 材质文档为准。
+> 沉浸光感 API 已确认（见 `docs/notes-immersive-light-sense.md`）：`@kit.UIDesignKit` 的 `systemMaterialEffect`，仅施加于 `HdsNavigation` 标题栏与 `HdsTabs` 底部页签。本 Task（模拟器阶段）先用 `backgroundBlurStyle` 作视觉占位；真实沉浸光感在真机计划 D7 用 HDS 组件实现。
 
 **Files:**
 - Create: `entry/src/main/ets/components/ShowcaseChrome.ets`
@@ -996,7 +996,8 @@ export struct ShowcaseChrome {
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
-      // 顶部 TitleBar —— 光线勾勒（候选属性：HDS TitleBarStyle 或 .backgroundBlurStyle）
+      // 顶部 TitleBar —— 模拟器阶段用 backgroundBlurStyle 作视觉占位
+      // 真实沉浸光感（HdsNavigation + systemMaterialEffect IMMERSIVE）在真机计划 D7 实现，见 docs/notes-immersive-light-sense.md
       Row() {
         Text('‹').fontSize(24).fontColor('#FFF').onClick(() => this.onBack())
         Text(this.title).fontSize(18).fontColor('#FFF').layoutWeight(1).textAlign(TextAlign.Center)
@@ -1005,10 +1006,8 @@ export struct ShowcaseChrome {
       .width('100%')
       .height(56)
       .padding({ left: 16, right: 16 })
-      // ↓ 候选 A：HDS 沉浸光感材质（以 SDK 实际导出为准；若为 HDS 组件，替换为对应 TitleBar 样式）
-      // .material(MaterialType.REGULAR)            // 候选属性之一
-      .backgroundBlurStyle(BlurStyle.COMPONENT_REGULAR)  // 保底：毛玻璃
-      .border({ width: 0.5, color: 'rgba(255,255,255,0.25)' }) // 光线勾勒的保底近似
+      .backgroundBlurStyle(BlurStyle.COMPONENT_REGULAR)  // 占位：模拟器阶段的毛玻璃近似
+      .border({ width: 0.5, color: 'rgba(255,255,255,0.25)' })
     }
     .width('100%').height('100%')
   }
@@ -1017,7 +1016,7 @@ export struct ShowcaseChrome {
 
 - [ ] **Step 2: 真机/模拟器肉眼核对（设备相关）**
 
-部署到模拟器，肉眼确认 TitleBar 半透明叠在深色背景上、有描边。**光随指动/非线性形变/真实沉浸光感**的最终视觉效果留到「真机集成」计划（需 API 26 真机 + 已确认的 HDS 属性）。
+部署到模拟器，肉眼确认 TitleBar 半透明叠在深色背景上、有描边。**真实沉浸光感（光随指动/光线勾勒/非线性形变）**在真机计划 D7 用 `HdsNavigation`/`HdsTabs` + `systemMaterialEffect: IMMERSIVE` 实现（API 已确认，见 `docs/notes-immersive-light-sense.md`）。
 
 - [ ] **Step 3: 提交**
 

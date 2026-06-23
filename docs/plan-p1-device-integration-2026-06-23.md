@@ -16,7 +16,7 @@
 
 1. **本计划全部任务需 AGC 云调试真机（API 26 / 7.0.0.23）验证**——AR Engine 与 Spatial Recon 在模拟器上不可用。无真机则只能编译通过、不能功能验证。
 2. **NDK 函数名**（`HMS_AREngine_*`、`HMS_SpatialRecon_*`）来自官方文档原文；但**完整签名（参数类型、结构体字段、头文件路径）必须在实现时对照 SDK 实际头文件核验**：`ar/ar_engine_core.h`、`spatial_recon_interface.h`。本计划代码示意结构，不保证逐字段精确。
-3. **沉浸光感属性名**：执行 Task D7 前必须先确认（见地基计划 Task 12 的风险点）。确认来源：HDS 材质文档 `ui-design-hds-component-material` 或重试 `arkts-immersive-light-sense`。
+3. **沉浸光感 API 已确认**（见 `docs/notes-immersive-light-sense.md`）：`@kit.UIDesignKit` 的 `systemMaterialEffect`（`materialType`/`materialLevel`），施加于 `HdsNavigation` 标题栏与 `HdsTabs` 底部页签；`IMMERSIVE` 材质自带光随指动/光线勾勒/非线性形变。
 4. **单 session 守卫与温升暂停是硬约束**（官方文档明示违反是未定义行为）。
 
 ---
@@ -379,7 +379,7 @@ git push
 
 ## Task D7: 沉浸光感真实动效
 
-> ⚠️ 前置：先确认沉浸光感确切属性名（重试 `arkts-immersive-light-sense` 或查 HDS 材质文档），写入 `docs/` 笔记后再做本 Task。
+> API 已确认（`docs/notes-immersive-light-sense.md`）：用 `HdsNavigation`/`HdsTabs` + `systemMaterialEffect: { materialType: IMMERSIVE, materialLevel: EXQUISITE }`，并以 `hdsMaterial.getSystemMaterialTypes()` 查询做降级（不支持 IMMERSIVE → BACKGROUND_BLUR + SMOOTH）。
 
 **Files:**
 - Modify: `SpatialBoutique/entry/src/main/ets/components/ShowcaseChrome.ets`（升级光感）
