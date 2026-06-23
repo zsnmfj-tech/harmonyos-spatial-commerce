@@ -1,0 +1,79 @@
+# HarmonyOS 构建检查
+#
+# 目的：push / PR 改动 SpatialBoutique 工程时，验证能编译出 HAP。
+# 不跑设备测试（AR/Spatial Recon/光感需真机）。
+#
+# ⚠️ 本 workflow 是**结构正确的模板**，但 SDK 装配步骤未经验证——
+#   HarmonyOS command-line tools 由华为登录后下载，CI 里需自行托管。
+#   见下方 TODO，按实际版本与下载源补全后再首次触发。
+#
+# 触发门控：仅当 SpatialBoutique/ 或本 workflow 文件变动时运行。
+# 工程未创建前（Task 1 未做）自动跳过，不会报错。
+
+name: build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SpatialBoutique/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'SpatialBoutique/**'
+      - '.github/workflows/build.yml'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SpatialBoutique
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # hvigor 依赖 Node；版本按 DevEco 要求调整
+
+      - name: Set up HarmonyOS command-line tools
+        # TODO（需配置）：
+        # 1. 从华为开发者站下载 commandline-tools-linux-x64（登录后获取），
+        #    自行托管（OSS/私有 release），把直链放进仓库 secret：HARMONYOS_CMDLINE_URL。
+        # 2. 固定版本号（如 5.0.7.200），避免隐式升级踩坑。
+        # 3. 解压后设 DEVECO_SDK_HOME 指向 sdk 目录。
+        env:
+          CMDLINE_URL: ${{ secrets.HARMONYOS_CMDLINE_URL }}
+        run: |
+          if [ -z "$CMDLINE_URL" ]; then
+            echo "::warning::未配置 secrets.HARMONYOS_CMDLINE_URL，跳过 SDK 装配。请在仓库 Settings→Secrets 配置后重试。"
+            exit 1
+          fi
+          curl -fsSL "$CMDLINE_URL" -o /tmp/cmdline.zip
+          unzip -q /tmp/cmdline.zip -d "$HOME/deveco"
+          echo "DEVECO_SDK_HOME=$HOME/deveco/sdk" >> "$GITHUB_ENV"
+          echo "$HOME/deveco/tool/bin" >> "$GITHUB_PATH"
+
+      - name: Install hvigor dependencies
+        run: |
+          [ -f oh-package.json5 ] && npm install || true
+          # DevEco 工程自带 hvigorw；若依赖 ohpm 包，按需补 ohpm install
+
+      - name: Build HAP (assembleHap)
+        run: |
+          chmod +x hvigorw
+          ./hvigorw clean --no-daemon
+          ./hvigorw assembleHap --no-daemon --mode module -p product=default
+
+      - name: Upload HAP artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hap-build
+          # 构建产物路径按 DevEco 默认布局；若不同请调整
+          path: SpatialBoutique/entry/build/default/outputs/default/*.hap
+          if-no-files-found: warn
+          retention-days: 7
