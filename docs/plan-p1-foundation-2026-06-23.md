@@ -65,18 +65,19 @@ SpatialBoutique/                         # DevEco 工程（Task 1 创建）
 │       ├── recon/MockReconEngine.test.ets
 │       ├── common/AppMode.test.ets
 │       └── flow/SmokeFlow.test.ets      # 端到端 mock 闭环
-└── docs/superpowers/                    # spec + plan 已在仓库内
+# 注：spec / plan / CLAUDE.md 在仓库根 商品3D展示-HMOS/docs/，不在 SpatialBoutique 工程目录内
 ```
 
 **模块依赖顺序**：model → common → store/recon(mock) → pages → components → flow。Tasks 按此顺序。
 
 ---
 
-## Task 1: DevEco 工程脚手架 + git
+## Task 1: DevEco 工程脚手架
+
+> 仓库已在 `商品3D展示-HMOS/`（仓库根）init 并推到 GitHub（`origin/main`）。SpatialBoutique 作为**子目录**加入现有仓库，本 Task **不再 `git init`**。
 
 **Files:**
-- Create: `SpatialBoutique/`（DevEco "Empty Ability" 模板工程）
-- Create: `SpatialBoutique/.gitignore`
+- Create: `SpatialBoutique/`（DevEco "Empty Ability" 模板工程，位于仓库根内）
 
 - [ ] **Step 1: 在 DevEco Studio 创建工程**
 
@@ -92,30 +93,20 @@ File → New → Create Project → Application → Empty Ability。
 Run（在 DevEco 工具栏）：`hvigorw assembleHap`
 Expected: BUILD SUCCESSFUL，生成 `entry/build/default/outputs/default/entry-default-signed.hap`
 
-- [ ] **Step 3: 加 .gitignore**
+- [ ] **Step 3: 确认 .gitignore 覆盖 DevEco 产物**
 
-```
-/.idea
-/build
-/entry/build
-**/build/
-/.hvigor
-.cxx/
-local.properties
-*.hap
-/.superpowers/
-```
+仓库根已有 `.gitignore`（覆盖 `**/build/` / `.cxx/` / `.hvigor/` / `local.properties` / `*.hap` / `oh_modules/` 等）。DevEco 建工程时可能在 `SpatialBoutique/` 内再生成一个项目级 `.gitignore`——两者都保留，不冲突。
 
-- [ ] **Step 4: 初始化 git 并提交**
+- [ ] **Step 4: 提交到现有仓库并推送**
+
+仓库已在父目录 init 并连到 GitHub。从仓库根添加 SpatialBoutique、提交、推送：
 
 ```bash
-cd SpatialBoutique
-git init
-git add .
+cd 商品3D展示-HMOS       # 仓库根（含 .git、CLAUDE.md、docs/）
+git add SpatialBoutique
 git commit -m "chore: scaffold DevEco SpatialBoutique project (API 26)"
+git push
 ```
-
-> 注：此提交同时把已写的 spec/plan（在 `docs/superpowers/`）纳入版本管理。
 
 ---
 
