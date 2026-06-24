@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    { "name": "mat_metal", "value": "金属" },
+    { "name": "mat_gem",   "value": "宝石" },
+    { "name": "mat_glass", "value": "玻璃" },
+    { "name": "mat_matte", "value": "哑光" }
+  ]
+}
