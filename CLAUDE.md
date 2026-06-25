@@ -1,22 +1,21 @@
 # harmonyos-spatial-commerce · 项目状态（一键继续入口）
 
-> **下次会话先读本文件。** 最后更新：2026-06-24。
+> **下次会话先读本文件。** 最后更新：2026-06-25。
 
 ## 一句话现状
 
-HarmonyOS 7（API 26）「空间化」能力的商品 3D 展示 App，**已完成头脑风暴 + 设计 spec + P1 实现计划，尚未开始编码**。下一步：在 DevEco Studio 里执行 P1 计划的 Task 1（建工程）。
+HarmonyOS 7（API 26）「空间化」能力的商品 3D 展示 App，**P1 地基 14 Task 全绿**（端到端 SmokeFlow 在本地模拟器跑通 6 套件），ohosTest 脚手架已修复。下一步：**真机集成 D1**（NDK/napi 骨架，代码已预写到 `pending-src/D1/`）。
 
 ---
 
 ## 立即下一步（只做这件事）
 
 1. 打开 **DevEco Studio**（API 26 / HarmonyOS 7 SDK）。
-2. 按 `docs/plan-p1-foundation-2026-06-23.md` 的 **Task 1** 创建工程：
-   - Project name: `SpatialBoutique`，Bundle: `com.spatial.boutique`，Compile/Target SDK = **API 26**，ArkTS，Phone。
-   - 建在 `harmonyos-spatial-commerce/SpatialBoutique/` 下（DevEco 工程名用 ASCII）。
-3. 按 Task 1 验证 `hvigorw assembleHap` 构建通过，`git init`，首次提交。
-4. 然后顺序执行 Task 2–14。
-5. **地基 14 Task 完成后**，再按 `docs/plan-p1-device-integration-2026-06-23.md` 执行 D1–D10（真 NDK 实现，需云调试真机）。
+2. 按 `pending-src/D1/README.md` 把 NDK 骨架贴入工程（cpp 目录 + build-profile.json5 改动 + 权限）。
+3. Sync 后 `./hvigorw assembleHap` 验证编译通过、HAP 含 `libspatial_native.so`。
+4. **D1 需 AGC 云调试真机**（API 26 / 7.0.0.23）做功能验证；模拟器只能验编译。
+5. 然后顺序执行 D2–D10（按 `docs/plan-p1-device-integration-2026-06-23.md`）。
+6. P1 真机集成完成后 → 启动 P2 商品化 brainstorm。
 
 ---
 
