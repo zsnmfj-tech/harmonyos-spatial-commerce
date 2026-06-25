@@ -52,7 +52,7 @@ HarmonyOS 7（API 26）空间化能力的商品 3D 展示 App。**P1 地基 14 T
 
 > 按 `docs/plan-p1-device-integration-2026-06-23.md` 执行。**依赖地基 T1–T14 完成。**
 
-- [ ] D1 NDK/napi 骨架（CMake + napi 注册）
+- [x] D1 NDK/napi 骨架（CMake + napi 注册）— BUILD SUCCESSFUL，HAP 含 libspatial_native.so（2026-06-25）
 - [ ] D2 真 CaptureKit（AR Engine 1080×1440 + PushARFrame + RunningMode）
 - [ ] D3 温升观察者（订阅 COMMON_EVENT_THERMAL_LEVEL_CHANGED 自动暂停）
 - [ ] D4 真 ReconEngine（Spatial Recon 生命周期 + 单 session 守卫 + 存 PLY/MP4）
