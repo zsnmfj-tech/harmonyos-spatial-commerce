@@ -8,7 +8,7 @@ import materialPresetTest from './MaterialPreset.test';
 import localModelStoreTest from './LocalModelStore.test';
 import mockReconEngineTest from './MockReconEngine.test';
 import appModeTest from './AppMode.test';
-// import smokeFlowTest from './SmokeFlow.test';    // Task 14
+import smokeFlowTest from './SmokeFlow.test';
 
 export default function testsuite() {
   abilityTest();
@@ -16,5 +16,5 @@ export default function testsuite() {
   localModelStoreTest();
   mockReconEngineTest();
   appModeTest();
-  // smokeFlowTest();        // Task 14
+  smokeFlowTest();
 }
