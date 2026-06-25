@@ -14,6 +14,7 @@
 | 2 | `napi_module` 重复声明 `nm_register_func` 字段 | 仅声明一次 | 重复字段会编译失败 |
 | 3 | CMakeLists 一次列 4 个 .cpp（含 D2/D3/D4 才有的） | D1 只列 `napi_init.cpp` | 其余文件 D1 时还不存在，链接会报 `Cannot find source file` |
 | 4 | `cpp/` 放在 `SpatialBoutique/cpp/`（工程根） | 改放 `SpatialBoutique/entry/src/main/cpp/` | DevEco 默认 NDK 源码搜索位置；`externalNativeOptions.path` 相对 entry 模块定位更可靠 |
+| 5 | `find_library(napi-lib napi)` | `find_library(napi-lib ace_napi.z)` | HarmonyOS 7 / API 26 SDK 里 napi 运行时库真名是 `libace_napi.z.so`，不是 `libnapi.so`；不改会报 `napi-lib set to NOTFOUND` |
 
 ---
 

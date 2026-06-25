@@ -15,7 +15,6 @@ add_library(spatial_native SHARED
 
 # HarmonyOS 7 / API 26 的 napi 运行时库真名为 libace_napi.z.so，
 # find_library 传 ace_napi.z（CMake 自动补 lib 前缀与 .so 后缀）。
-# ⚠️ 若 SDK 版本不同，到 <sdk>/openharmony/native/sysroot/usr/lib/aarch64-linux-ohos/ 查 *napi* 确认真名。
 find_library(napi-lib ace_napi.z)
 
 # AR Engine / Spatial Recon 的 .so 名以 SDK 实际头文件链接要求为准。
