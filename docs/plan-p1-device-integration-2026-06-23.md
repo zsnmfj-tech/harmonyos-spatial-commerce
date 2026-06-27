@@ -48,7 +48,7 @@ SpatialBoutique/
 
 ---
 
-## Task D1: NDK 工程结构 + napi 骨架
+## Task D1: NDK 工程结构 + napi 骨架（✅ 已完成 2026-06-26）
 
 **Files:**
 - Create: `SpatialBoutique/cpp/CMakeLists.txt`
@@ -58,21 +58,26 @@ SpatialBoutique/
 
 - [ ] **Step 1: 配置 CMake 与 NDK 编译选项**
 
-`cpp/CMakeLists.txt`（示意，按实际 SDK 调整链接库）：
+`cpp/CMakeLists.txt`（库名已实测自本机 SDK，详见 `docs/notes-ndk-api-2026-06-25.md`）：
 ```cmake
-cmake_minimum_required(are.DEFAULT_PROJECT)
+cmake_minimum_required(VERSION 3.5.0)
 project(spatial_boutique_native)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_library(spatial_native SHARED
     napi_init.cpp
-    capture_kit_native.cpp
-    recon_engine_native.cpp
-    thermal_observer.cpp
+    # D2/D3/D4 起追加：capture_kit_native.cpp / thermal_observer.cpp / recon_engine_native.cpp
 )
-find_library(napi-lib napi)
-# AR Engine / Spatial Recon 的 .so 由 SDK 提供，按文档 actual names 链接
-target_link_libraries(spatial_native ${napi-lib} hms_ar_engine hms_spatial_recon)
+
+find_library(napi-lib ace_napi.z)        # HarmonyOS 7 API 26 真名 libace_napi.z.so
+# D2 起追加：
+# find_library(ar-lib arengine_ndk.z)    # libarengine_ndk.z.so
+# D4 起追加：
+# find_library(recon-lib spatial_recon_ndk.z)  # libspatial_recon_ndk.z.so
+
+target_link_libraries(spatial_native ${napi-lib})
 ```
 
 `entry/build-profile.json5` 加 `externalNativeOptions: { path: './cpp/CMakeLists.txt', arguments, abiFilters: ['arm64-v8a'] }`，并配 `nativeLib`。
@@ -121,10 +126,10 @@ git push
 
 - [ ] **Step 1: 实现 AR Engine 会话与推帧**
 
-`capture_kit_native.cpp`（示意，签名以 `ar/ar_engine_core.h` 为准）：
+`capture_kit_native.cpp`（签名已对照本机 SDK 实测，见 `docs/notes-ndk-api-2026-06-25.md`）：
 ```cpp
 #include "ar/ar_engine_core.h"
-#include "spatial_recon_interface.h"
+#include "spatial/spatial_recon_interface.h"   // 注意 spatial/ 子目录
 #include "napi/native_api.h"
 
 static AREngine_ARSession* g_arSession = nullptr;
@@ -132,8 +137,10 @@ static AREngine_ARFrame*   g_arFrame   = nullptr;
 static HMS_SpatialRecon_Session g_reconSession = nullptr; // 由 D4 注入
 
 napi_value CaptureStart(napi_env env, napi_callback_info info) {
-    // 1) 创建 + 配置 AR 会话
-    HMS_AREngine_ARSession_Create(nullptr, nullptr, &g_arSession);
+    // 1) 创建 + 配置 AR 会话。返回类型是 AREngine_ARStatus（不是 HMS_AREngine_*）
+    AREngine_ARStatus st;
+    st = HMS_AREngine_ARSession_Create(/*env*/ nullptr, /*applicationContext*/ nullptr, &g_arSession);
+    if (st != ARENGINE_OK) return /* napi 抛 CaptureError */;
     AREngine_ARConfig* cfg = nullptr;
     HMS_AREngine_ARConfig_Create(g_arSession, &cfg);
     // 硬约束：预览 1080×1440
@@ -141,22 +148,21 @@ napi_value CaptureStart(napi_env env, napi_callback_info info) {
     HMS_AREngine_ARConfig_SetUpdateMode(g_arSession, cfg, ARENGINE_UPDATE_MODE_LATEST);
     HMS_AREngine_ARConfig_SetFocusMode(g_arSession, cfg, ARENGINE_FOCUS_MODE_AUTO);
     HMS_AREngine_ARSession_Configure(g_arSession, cfg);
-    HMS_AREngine_ARConfig_Destroy(cfg);
     HMS_AREngine_ARFrame_Create(g_arSession, &g_arFrame);
     return nullptr;
 }
 
 // 每帧由渲染循环/定时器调用（D5 在 ArkTS 侧驱动）
 napi_value CapturePushFrame(napi_env env, napi_callback_info info) {
-    // 推帧前必须先 Update 一次 AR 结果
+    // Update 是更新 AR 结果（frame 是出参），不是推帧
     HMS_AREngine_ARSession_Update(g_arSession, g_arFrame);
+    // 真正推帧给 Spatial Recon：
     HMS_SpatialRecon_PushARFrame(g_reconSession, g_arSession, g_arFrame);
     return nullptr;
 }
 
 napi_value CaptureStop(napi_env env, napi_callback_info info) {
-    if (g_arFrame)   HMS_AREngine_ARFrame_Destroy(g_arFrame);
-    if (g_arSession) HMS_AREngine_ARSession_Destroy(g_arSession);
+    if (g_arSession) HMS_AREngine_ARSession_Stop(g_arSession);   // 真名 Stop 不是 Destroy
     g_arFrame = nullptr; g_arSession = nullptr;
     return nullptr;
 }
@@ -224,15 +230,24 @@ git push
 
 - [ ] **Step 1: 实现完整生命周期（签名以 `spatial_recon_interface.h` 为准）**
 
-`recon_engine_native.cpp`（示意）：
+`recon_engine_native.cpp`（签名已对照本机 SDK 实测）：
 ```cpp
-#include "spatial_recon_interface.h"
+#include "spatial/spatial_recon_interface.h"   // 注意 spatial/ 子目录
 
 static HMS_SpatialRecon_Session g_session = nullptr;
 static bool g_running = false;
 
+// ⭐ A0 验证专用：D2 之前就能用。云调试上点按钮调这个，立即知道重建能力是否支持。
+napi_value ReconIsSupport(napi_env env, napi_callback_info info) {
+    HMS_SpatialReconStatus st = HMS_SpatialRecon_IsSupport(SPATIAL_RECON_MODEL_3D /* 以 SDK 枚举真名 */);
+    bool ok = (st == HMS_SPATIAL_RECON_SUCCESS);
+    return /* napi_boolean(ok) */;
+}
+
 napi_value ReconCreate(napi_env env, napi_callback_info info) {
-    HMS_SpatialRecon_Create(&g_session);
+    // 真签名：CreateSession(type, workPath, &session) —— 比 plan 原稿多 workPath
+    HMS_SpatialReconStatus st = HMS_SpatialRecon_CreateSession(
+        SPATIAL_RECON_MODEL_3D, "/data/storage/el2/base/haps/recon", &g_session);
     return nullptr;
 }
 
@@ -241,11 +256,8 @@ napi_value ReconStart(napi_env env, napi_callback_info info) {
     g_running = true;
     HMS_SpatialRecon_ModelWriteInfo info = {};
     info.modelFormat = SPATIAL_RECON_OUTPUT_FORMAT_PLY; // 主产物 PLY
-    // 可选 MP4：第二个 writeInfo 或独立调用
-    HMS_SpatialRecon_StartSession(g_session, &info, [](HMS_SpatialReconStatus status) {
-        // 完成回调 → 经 napi 抛回 ArkTS → 触发 SaveResultToFile / 完成 Promise
-    });
-    HMS_SpatialRecon_SetRunningMode(SPATIAL_RECON_RUNNING_FOREGROUND_MODE);
+    HMS_SpatialRecon_StartSession(g_session, &info);
+    HMS_SpatialRecon_SetRunningMode(g_session, SPATIAL_RECON_RUNNING_FOREGROUND_MODE);
     return nullptr;
 }
 
@@ -255,7 +267,6 @@ napi_value ReconResume(napi_env env, napi_callback_info info) { HMS_SpatialRecon
 napi_value ReconProgress(napi_env env, napi_callback_info info) {
     float p = 0.0f;
     HMS_SpatialRecon_GetProgress(g_session, &p, nullptr);
-    // 返回 p（0..1）给 ArkTS
     return /* napi_double(p) */;
 }
 
@@ -263,7 +274,6 @@ napi_value ReconSave(napi_env env, napi_callback_info info) {
     HMS_SpatialRecon_ModelWriteInfo info = {};
     info.modelFormat = SPATIAL_RECON_OUTPUT_FORMAT_PLY;
     HMS_SpatialRecon_SaveResultToFile(g_session, &info, nullptr);
-    // 返回 PLY 路径给 ArkTS（ArkTS 再交给 ModelStore.save）
     return /* napi_string(plyPath) */;
 }
 ```
